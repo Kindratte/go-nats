@@ -27,11 +27,11 @@ import (
 
 // Some sane defaults
 const (
-	DefaultNumMsgs         = 100000
-	DefaultNumPubs         = 1
-	DefaultNumPubsRoutines = 100
-	DefaultNumSubs         = 0
-	DefaultMessageSize     = 128
+	DefaultNumMsgs = 100000
+	DefaultNumPubs = 1
+	//DefaultNumPubsRoutines = 100
+	DefaultNumSubs     = 0
+	DefaultMessageSize = 128
 )
 
 func usage() {
@@ -44,7 +44,7 @@ func main() {
 	var urls = flag.String("s", nats.DefaultURL, "The nats server URLs (separated by comma)")
 	var tls = flag.Bool("tls", false, "Use TLS Secure Connection")
 	var numPubs = flag.Int("np", DefaultNumPubs, "Number of Concurrent Publishers")
-	var numPubsRoutines = flag.Int("npr", DefaultNumPubsRoutines, "Number of routines for one publisher")
+	//var numPubsRoutines = flag.Int("npr", DefaultNumPubsRoutines, "Number of routines for one publisher")
 	var numSubs = flag.Int("ns", DefaultNumSubs, "Number of Concurrent Subscribers")
 	var numMsgs = flag.Int("n", DefaultNumMsgs, "Number of Messages to Publish")
 	var msgSize = flag.Int("ms", DefaultMessageSize, "Size of the message.")
@@ -107,9 +107,9 @@ func main() {
 		}
 		defer nc.Close()
 
-		for j := 0; j < *numPubsRoutines; i++ {
-			go runPublisher(nc, &startwg, &donewg, pubCounts[i], *msgSize)
-		}
+		//for j := 0; j < *numPubsRoutines; i++ {
+		go runPublisher(nc, &startwg, &donewg, pubCounts[i], *msgSize)
+		//}
 	}
 
 	log.Printf("Starting benchmark [msgs=%d, msgsize=%d, pubs=%d, subs=%d]\n", *numMsgs, *msgSize, *numPubs, *numSubs)
