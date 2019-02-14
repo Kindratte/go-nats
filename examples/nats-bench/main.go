@@ -77,7 +77,7 @@ func main() {
 		opts = append(opts, nats.Secure(nil))
 	}
 
-	benchmark = bench.NewBenchmark("NATS", *numSubs, *numPubs)
+	benchmark = bench.NewBenchmark("NATS", *numSubs, *numPubs**numPubsRoutines)
 
 	var startwg sync.WaitGroup
 	var donewg sync.WaitGroup
