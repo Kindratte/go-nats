@@ -160,6 +160,7 @@ func runSubscriber(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs int, 
 	ch := make(chan time.Time, 2)
 	sub, _ := nc.Subscribe(subj, func(msg *nats.Msg) {
 		received++
+		time.Sleep(2 * time.Second)
 		//nc.Publish(msg.Reply, []byte("reply"))
 		if received == 1 {
 			ch <- time.Now()
