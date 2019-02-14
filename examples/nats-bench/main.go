@@ -168,7 +168,7 @@ func runSubscriber(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs int, 
 			ch <- time.Now()
 		}
 	})
-	if err := sub.SetPendingLimits(0, 0); err != nil {
+	if err := sub.SetPendingLimits(1, 1024); err != nil {
 		log.Fatalf("Pending limit %v", err)
 	}
 	nc.Flush()
