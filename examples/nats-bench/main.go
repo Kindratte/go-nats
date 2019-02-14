@@ -143,9 +143,13 @@ func runPublisher(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs, msgSi
 	for i := 0; i < numRoutines; i++ {
 		go func() {
 			for j := 0; j < numMsgsPerRoutine; j++ {
-				nc.Publish(subj, msg)
+				if err := nc.Publish(subj, msg); err != nil {
+					log.Fatalf("Publish %v", err)
+				}
 			}
-			nc.Flush()
+			if err := nc.Flush(); err != nil {
+				log.Fatalf("Publish flush %v", err)
+			}
 			donewg.Done()
 		}()
 	}
@@ -160,7 +164,7 @@ func runSubscriber(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs int, 
 	ch := make(chan time.Time, 2)
 	sub, _ := nc.Subscribe(subj, func(msg *nats.Msg) {
 		received++
-		time.Sleep(2 * time.Second)
+		//time.Sleep(2 * time.Second)
 		//nc.Publish(msg.Reply, []byte("reply"))
 		if received == 1 {
 			ch <- time.Now()
@@ -172,7 +176,9 @@ func runSubscriber(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs int, 
 	if err := sub.SetPendingLimits(1, 1024); err != nil {
 		log.Fatalf("Pending limit %v", err)
 	}
-	nc.Flush()
+	if err := nc.Flush(); err != nil {
+		log.Fatalf("Subscribe flush %v", err)
+	}
 	startwg.Done()
 
 	start := <-ch
