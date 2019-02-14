@@ -168,7 +168,7 @@ func runSubscriber(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs int, 
 			ch <- time.Now()
 		}
 	})
-	sub.SetPendingLimits(-1, -1)
+	sub.SetPendingLimits(0, 0)
 	nc.Flush()
 	startwg.Done()
 
