@@ -27,11 +27,11 @@ import (
 
 // Some sane defaults
 const (
-	DefaultNumMsgs = 100000
-	DefaultNumPubs = 1
-	//DefaultNumPubsRoutines = 100
-	DefaultNumSubs     = 0
-	DefaultMessageSize = 128
+	DefaultNumMsgs         = 100000
+	DefaultNumPubs         = 1
+	DefaultNumPubsRoutines = 100
+	DefaultNumSubs         = 0
+	DefaultMessageSize     = 128
 )
 
 func usage() {
@@ -44,7 +44,7 @@ func main() {
 	var urls = flag.String("s", nats.DefaultURL, "The nats server URLs (separated by comma)")
 	var tls = flag.Bool("tls", false, "Use TLS Secure Connection")
 	var numPubs = flag.Int("np", DefaultNumPubs, "Number of Concurrent Publishers")
-	//var numPubsRoutines = flag.Int("npr", DefaultNumPubsRoutines, "Number of routines for one publisher")
+	var numPubsRoutines = flag.Int("npr", DefaultNumPubsRoutines, "Number of routines for one publisher")
 	var numSubs = flag.Int("ns", DefaultNumSubs, "Number of Concurrent Subscribers")
 	var numMsgs = flag.Int("n", DefaultNumMsgs, "Number of Messages to Publish")
 	var msgSize = flag.Int("ms", DefaultMessageSize, "Size of the message.")
@@ -107,9 +107,9 @@ func main() {
 		}
 		defer nc.Close()
 
-		//for j := 0; j < *numPubsRoutines; i++ {
-		go runPublisher(nc, &startwg, &donewg, pubCounts[i], *msgSize)
-		//}
+		for j := 0; j < *numPubsRoutines; i++ {
+			go runPublisher(nc, &startwg, &donewg, pubCounts[i], *msgSize)
+		}
 	}
 
 	log.Printf("Starting benchmark [msgs=%d, msgsize=%d, pubs=%d, subs=%d]\n", *numMsgs, *msgSize, *numPubs, *numSubs)
@@ -133,22 +133,24 @@ func runPublisher(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs int, m
 
 	args := flag.Args()
 	subj := args[0]
-	var payload []byte
+	//var payload []byte
+	var msg []byte
 	if msgSize > 0 {
-		payload = make([]byte, msgSize)
+		//payload = make([]byte, msgSize)
+		msg = make([]byte, msgSize)
 	}
 
 	start := time.Now()
 
 	for i := 0; i < numMsgs; i++ {
-		//nc.Publish(subj, msg)
-		_, err := nc.Request(subj, []byte(payload), time.Second)
-		if err != nil {
-			if nc.LastError() != nil {
-				log.Fatalf("%v for request", nc.LastError())
-			}
-			log.Fatalf("%v for request", err)
-		}
+		nc.Publish(subj, msg)
+		//_, err := nc.Request(subj, []byte(payload), time.Second)
+		//if err != nil {
+		//	if nc.LastError() != nil {
+		//		log.Fatalf("%v for request", nc.LastError())
+		//	}
+		//	log.Fatalf("%v for request", err)
+		//}
 	}
 	nc.Flush()
 	benchmark.AddPubSample(bench.NewSample(numMsgs, msgSize, start, time.Now(), nc))
@@ -164,7 +166,7 @@ func runSubscriber(nc *nats.Conn, startwg, donewg *sync.WaitGroup, numMsgs int, 
 	ch := make(chan time.Time, 2)
 	sub, _ := nc.Subscribe(subj, func(msg *nats.Msg) {
 		received++
-		nc.Publish(msg.Reply, []byte("reply"))
+		//nc.Publish(msg.Reply, []byte("reply"))
 		if received == 1 {
 			ch <- time.Now()
 		}
