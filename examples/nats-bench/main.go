@@ -82,7 +82,7 @@ func main() {
 	var startwg sync.WaitGroup
 	var donewg sync.WaitGroup
 
-	donewg.Add(*numPubs + *numSubs)
+	donewg.Add(*numPubs**numPubsRoutines + *numSubs)
 
 	// Run Subscribers first
 	startwg.Add(*numSubs)
