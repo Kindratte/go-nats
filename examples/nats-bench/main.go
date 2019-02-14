@@ -99,7 +99,7 @@ func main() {
 
 	// Now Publishers
 	startwg.Add(*numPubs)
-	pubCounts := bench.MsgsPerClient(*numMsgs, *numPubs**numPubsRoutines)
+	pubCounts := bench.MsgsPerClient(*numMsgs, *numPubsRoutines)
 	for i := 0; i < *numPubs; i++ {
 		nc, err := nats.Connect(*urls, opts...)
 		if err != nil {
@@ -107,8 +107,8 @@ func main() {
 		}
 		defer nc.Close()
 
-		for j := 0; j < *numPubsRoutines; i++ {
-			go runPublisher(nc, &startwg, &donewg, pubCounts[i], *msgSize)
+		for j := 0; j < *numPubsRoutines; j++ {
+			go runPublisher(nc, &startwg, &donewg, pubCounts[j], *msgSize)
 		}
 	}
 
