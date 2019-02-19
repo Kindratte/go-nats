@@ -30,8 +30,8 @@ func usage() {
 	log.Fatalf("Usage: nats-rply [-s server] [-creds file] [-t] <subject> <response>")
 }
 
-func printMsg(m *nats.Msg, i int) {
-	log.Printf("[#%d] Received on [%s]: '%s'\n", i, m.Subject, string(m.Data))
+func printMsg(m *nats.Msg) {
+	log.Printf("[#%s] Received on [%s]", m.Data, m.Subject)
 }
 
 func main() {
@@ -66,7 +66,7 @@ func main() {
 	subj, reply, i := args[0], args[1], 0
 
 	nc.Subscribe(subj, func(msg *nats.Msg) {
-		go handler(i, msg, reply, nc)
+		go handler(msg, reply, nc)
 	})
 	nc.Flush()
 
@@ -82,9 +82,8 @@ func main() {
 	runtime.Goexit()
 }
 
-func handler(i int, msg *nats.Msg, reply string, nc *nats.Conn) {
-	i++
-	printMsg(msg, i)
+func handler(msg *nats.Msg, reply string, nc *nats.Conn) {
+	printMsg(msg)
 	nc.Publish(msg.Reply, []byte(reply))
 }
 
