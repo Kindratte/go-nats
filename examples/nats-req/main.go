@@ -60,16 +60,14 @@ func main() {
 	defer nc.Close()
 
 	for i := 0; i < 1000; i++ {
-		go func(num int) {
-			msg, err := nc.Request(subj, []byte(strconv.Itoa(num)), time.Second)
-			if err != nil {
-				if nc.LastError() != nil {
-					log.Fatalf("%v for request", nc.LastError())
-				}
-				log.Fatalf("%v for request", err)
+		msg, err := nc.Request(subj, []byte(strconv.Itoa(i)), time.Second)
+		if err != nil {
+			if nc.LastError() != nil {
+				log.Fatalf("%v for request", nc.LastError())
 			}
-			log.Printf("Published [%s] : '%s'", strconv.Itoa(num), payload)
-			log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
-		}(i)
+			log.Fatalf("%v for request", err)
+		}
+		log.Printf("Published [%s] : '%s'", strconv.Itoa(i), payload)
+		log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
 	}
 }
