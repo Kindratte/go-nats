@@ -66,9 +66,7 @@ func main() {
 	subj, reply, i := args[0], args[1], 0
 
 	nc.Subscribe(subj, func(msg *nats.Msg) {
-		i++
-		printMsg(msg, i)
-		nc.Publish(msg.Reply, []byte(reply))
+		go handler(i, msg, reply, nc)
 	})
 	nc.Flush()
 
@@ -82,6 +80,12 @@ func main() {
 	}
 
 	runtime.Goexit()
+}
+
+func handler(i int, msg *nats.Msg, reply string, nc *nats.Conn) {
+	i++
+	printMsg(msg, i)
+	nc.Publish(msg.Reply, []byte(reply))
 }
 
 func setupConnOptions(opts []nats.Option) []nats.Option {
