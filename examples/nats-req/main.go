@@ -50,8 +50,7 @@ func main() {
 		opts = append(opts, nats.UserCredentials(*userCreds))
 	}
 
-	subj := "abc"
-	payload := "hello"
+	subj, payload := args[0], []byte(args[1])
 
 	for i := 0; i < 100000; i++ {
 		go func() {
