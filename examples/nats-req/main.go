@@ -52,13 +52,14 @@ func main() {
 
 	subj, payload := args[0], []byte(args[1])
 
+	nc, err := nats.Connect(*urls, opts...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer nc.Close()
+
 	for i := 0; i < 1000; i++ {
 		//go func() {
-		nc, err := nats.Connect(*urls, opts...)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer nc.Close()
 		msg, err := nc.Request(subj, []byte(payload), time.Second)
 		if err != nil {
 			if nc.LastError() != nil {
