@@ -50,22 +50,25 @@ func main() {
 		opts = append(opts, nats.UserCredentials(*userCreds))
 	}
 
-	// Connect to NATS
-	nc, err := nats.Connect(*urls, opts...)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer nc.Close()
-	subj, payload := args[0], []byte(args[1])
+	subj := "abc"
+	payload := "hello"
 
-	msg, err := nc.Request(subj, []byte(payload), time.Second)
-	if err != nil {
-		if nc.LastError() != nil {
-			log.Fatalf("%v for request", nc.LastError())
-		}
-		log.Fatalf("%v for request", err)
+	for i := 0; i < 100000; i++ {
+		go func() {
+			nc, err := nats.Connect(*urls, opts...)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer nc.Close()
+			msg, err := nc.Request(subj, []byte(payload), time.Second)
+			if err != nil {
+				if nc.LastError() != nil {
+					log.Fatalf("%v for request", nc.LastError())
+				}
+				log.Fatalf("%v for request", err)
+			}
+			log.Printf("Published [%s] : '%s'", subj, payload)
+			log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
+		}()
 	}
-
-	log.Printf("Published [%s] : '%s'", subj, payload)
-	log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
 }
