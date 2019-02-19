@@ -59,16 +59,16 @@ func main() {
 	defer nc.Close()
 
 	for i := 0; i < 1000; i++ {
-		//go func() {
-		msg, err := nc.Request(subj, []byte(payload), time.Second)
-		if err != nil {
-			if nc.LastError() != nil {
-				log.Fatalf("%v for request", nc.LastError())
+		go func() {
+			msg, err := nc.Request(subj, []byte(payload), time.Second)
+			if err != nil {
+				if nc.LastError() != nil {
+					log.Fatalf("%v for request", nc.LastError())
+				}
+				log.Fatalf("%v for request", err)
 			}
-			log.Fatalf("%v for request", err)
-		}
-		log.Printf("Published [%s] : '%s'", subj, payload)
-		log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
-		//}()
+			log.Printf("Published [%s] : '%s'", subj, payload)
+			log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
+		}()
 	}
 }
