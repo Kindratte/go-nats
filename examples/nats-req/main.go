@@ -52,7 +52,7 @@ func main() {
 
 	subj, payload := args[0], []byte(args[1])
 
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 1000; i++ {
 		go func() {
 			nc, err := nats.Connect(*urls, opts...)
 			if err != nil {
