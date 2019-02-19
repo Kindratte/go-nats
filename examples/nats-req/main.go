@@ -53,21 +53,21 @@ func main() {
 	subj, payload := args[0], []byte(args[1])
 
 	for i := 0; i < 1000; i++ {
-		go func() {
-			nc, err := nats.Connect(*urls, opts...)
-			if err != nil {
-				log.Fatal(err)
+		//go func() {
+		nc, err := nats.Connect(*urls, opts...)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer nc.Close()
+		msg, err := nc.Request(subj, []byte(payload), time.Second)
+		if err != nil {
+			if nc.LastError() != nil {
+				log.Fatalf("%v for request", nc.LastError())
 			}
-			defer nc.Close()
-			msg, err := nc.Request(subj, []byte(payload), time.Second)
-			if err != nil {
-				if nc.LastError() != nil {
-					log.Fatalf("%v for request", nc.LastError())
-				}
-				log.Fatalf("%v for request", err)
-			}
-			log.Printf("Published [%s] : '%s'", subj, payload)
-			log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
-		}()
+			log.Fatalf("%v for request", err)
+		}
+		log.Printf("Published [%s] : '%s'", subj, payload)
+		log.Printf("Received  [%v] : '%s'", msg.Subject, string(msg.Data))
+		//}()
 	}
 }
