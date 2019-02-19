@@ -63,7 +63,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	subj, reply, i := args[0], args[1], 0
+	subj, reply := args[0], args[1]
 
 	nc.Subscribe(subj, func(msg *nats.Msg) {
 		go handler(msg, reply, nc)
